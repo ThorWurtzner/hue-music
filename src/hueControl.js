@@ -9,7 +9,7 @@ const turnLightOnOrOff = async (on, sat, hue) => {
         return await axios.put(`http://${IP_ADDRESS}/api/${USERNAME}/lights/${HUE_ID}/state`, {
             on: on,
             sat: sat ? sat : 0,
-            hue: hue ? hue : 0 
+            hue: hue ? hue : 0,
         });
     } catch (err) {
         console.error(err);
@@ -26,4 +26,17 @@ async function changeBrightness (event, newValue) {
     }
 }
 
-export { turnLightOnOrOff, changeBrightness };
+async function changeColor (x, y) {
+    try {
+        return await axios.put(`http://${IP_ADDRESS}/api/${USERNAME}/lights/${HUE_ID}/state`, {
+            xy: [
+                x,
+                y
+            ],
+        });
+    } catch (err) {
+        console.error(err);
+    }
+}
+
+export { turnLightOnOrOff, changeBrightness, changeColor };
