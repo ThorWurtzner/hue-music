@@ -7,7 +7,7 @@ export default function Login(props) {
         response_type: "code",
         client_id: process.env.REACT_APP_CLIENT_ID,
         scope: "user-read-currently-playing user-read-playback-state",
-        redirect_uri: "http://localhost:3000/callback",
+        redirect_uri: "http://localhost:8888/callback",
         state: "kasdalskdjalksjdalksd"
     });
 

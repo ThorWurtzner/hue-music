@@ -9,6 +9,7 @@
     "@testing-library/react": "^11.2.7",
     "@testing-library/user-event": "^12.8.3",
     "axios": "^0.21.1",
+    "netlify-cli": "^6.7.1",
     "querystring": "^0.2.1",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
@@ -16,6 +17,7 @@
     "web-vitals": "^1.1.2"
   },
   "scripts": {
+    "dev": "netlify dev -f .netlify/functions",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",

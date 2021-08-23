@@ -10,11 +10,11 @@ exports.handler = async function(event, context) {
         method: "post",
         params: {
             code: body.code,
-            redirect_uri: process.env.REDIRECT_URI,
+            redirect_uri: "http://localhost:8888/callback",
             grant_type: "authorization_code"
         },
         headers: {
-            "Authorization": "Basic " + (Buffer.from(process.env.CLIENT_ID + ":" + process.env.CLIENT_SECRET).toString("base64"))
+            "Authorization": "Basic " + (Buffer.from(process.env.REACT_APP_CLIENT_ID + ":" + process.env.REACT_APP_CLIENT_SECRET).toString("base64"))
         }
     }
 
