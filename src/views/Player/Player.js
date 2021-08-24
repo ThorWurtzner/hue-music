@@ -5,6 +5,7 @@ import ButtonGroup from '@material-ui/core/ButtonGroup';
 import tokenContext from "../../tokenContext";
 import axios from "axios";
 import { navigate } from "@reach/router";
+import { fetchSong, songAnalysis } from "../../fetches";
 
 import { turnLightOnOrOff, changeBrightness, changeColor } from "../../hueControl";
 
@@ -16,17 +17,16 @@ export default function Player() {
     var imgRef = createRef();
 
     var token = useContext(tokenContext);
-
-    // if (!token[0]?.access_token) {
-    //     navigate("/")
-    // }
+    if (token[0]?.access_token === null) {
+        navigate("/");
+    }
 
     var [content, setContent] = useState();
     var [progress, setProgress] = useState();
     var [length, setLength] = useState();
     var [hexColor, setHexColor] = useState();
     var [hueColor, setHueColor] = useState();
-    var [timer, setTimer] = useState();
+    var [tempo, setTempo] = useState();
 
     function millisToMinutesAndSeconds(millis) {
         var minutes = Math.floor(millis / 60000);
@@ -75,37 +75,78 @@ export default function Player() {
     
     };
 
+    useEffect(() => {
+        turnLightOnOrOff(true);
+        fetchSong(token[0].access_token)
+            .then(response => {
+                setContent(response.data);
+            })
+    }, [])
+
     useEffect(function() {
-        axios.get("https://api.spotify.com/v1/me/player/currently-playing?market=DK", {
-            headers: {
-                "Authorization": "Bearer " + token[0].access_token
-            }
-        })
-        .then(response => {
-            setContent(response.data);
-            console.log(content);
-        });
-    }, [token, setContent, timer])
+        setInterval(() => {
+            fetchSong(token[0].access_token)
+                .then(response => {
+                    setContent(response.data);
+                }); 
+        }, 2000)
+
+    }, [token, setContent])
+
+    // useEffect(() => {
+    //     if (content) {
+    //         songAnalysis(token[0].access_token, content.item.id)
+    //             .then(response => {
+    //                 console.log(response.data);
+    //                 setTempo(response?.data.track.tempo)
+    //             })
+    //     }
+    // }, [content])
+
+    // useEffect(() => {
+    //     if (tempo) {
+    //         const period = 60 / tempo * 2;
+    //         setInterval(() => {
+    //             changeBrightness(null, 40)
+    //         }, period * 1000);
+
+    //         setInterval(() => {
+    //             changeBrightness(null, 60)
+    //         }, (period * 1000) * 2);
+    //     }
+    // }, [tempo])
+
+    // console.log(tempo);
 
     return (
         <div className="player" style={{backgroundColor: hexColor, minHeight: "100vh", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center"}}>
-            <Button variant="contained" style={{marginTop: "20px"}} onClick={() => setTimer(Math.random())}>Update</Button>
             <ButtonGroup variant="contained" style={{marginTop: "20px"}}>
                 <Button onClick={() => {turnLightOnOrOff(false)}}>Turn off</Button>
-                <Button onClick={() => {turnLightOnOrOff(true)}}>Turn on</Button>
+                <Button onClick={() => {
+                    turnLightOnOrOff(true);
+                    changeColor(hueColor[0], hueColor[1]);
+                }}>Turn on</Button>
             </ButtonGroup>
 
-            <ButtonGroup variant="contained" style={{margin: "10px 0"}}>
+            <Slider
+                style={{width: "200px"}}
+                onChangeCommitted={changeBrightness}
+                min={1}
+                max={254}
+            />
+
+            {/* <ButtonGroup variant="contained" style={{margin: "10px 0"}}>
                 <Button onClick={() => {turnLightOnOrOff(true, 0, 0)}}>White</Button>
                 <Button onClick={() => {turnLightOnOrOff(true, 254, 0)}}>Red</Button>
                 <Button onClick={() => {turnLightOnOrOff(true, 254, 15000)}}>Green</Button>
-            </ButtonGroup>
+            </ButtonGroup> */}
+            
             {content ?
                 <> 
-                    <h3 style={{color: "#fff", fontSize: "33px" }}>{content?.item.artists[0].name}</h3>
-                    <h1 style={{color: "#fff", fontSize: "60px", marginBottom: "30px"}}>{content?.item.name}</h1>
+                    <h3 style={{color: "#fff", fontSize: "30px" }}>{content?.item.artists[0].name}</h3>
+                    <h1 style={{color: "#fff", fontSize: "40px", marginBottom: "30px"}}>{content?.item.name}</h1>
                     <img
-                        style={{width: "500px"}}
+                        style={{width: "500px", borderRadius: "50%", border: "4px solid black"}}
                         crossOrigin={"anonymous"}
                         ref={imgRef}
                         src={content?.item.album.images[0].url}
@@ -121,7 +162,7 @@ export default function Player() {
                             setHexColor(hexColor);
                             var hueColor = RGBtoXY(result[0], result[1], result[2]);
                             setHueColor(hueColor);
-                            console.log(hueColor);
+                            // console.log(hueColor);
                             changeColor(hueColor[0], hueColor[1]);
                         }}
                     />
@@ -131,15 +172,14 @@ export default function Player() {
                         min={1}
                         max={content?.item.duration_ms / 1000}
                         track
-                        disabled
                     />
                     <p style={{color: "#fff"}}>{(content?.item.duration_ms / 1000).toFixed(0)}</p>
                     <p style={{color: "#fff"}}>{length}</p>
-                    {/* <p>{progress}</p> */}
-                    {/* <div style={{width: "200px", height: "200px", backgroundColor: hexColor}}></div> */}
+                    <p>{progress}</p>
                 </> 
                 :
-                <p style={{color: "#fff"}}>No song is currently playing</p>}
+                <p style={{color: "#000"}}>No song is currently playing</p>
+            }
         </div>
     )
 }
