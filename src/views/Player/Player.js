@@ -24,9 +24,11 @@ export default function Player() {
     var [content, setContent] = useState();
     var [progress, setProgress] = useState();
     var [length, setLength] = useState();
+
     var [hexColor, setHexColor] = useState();
     var [hueColor, setHueColor] = useState();
     var [tempo, setTempo] = useState();
+    var [bg, setBg] = useState();
 
     function millisToMinutesAndSeconds(millis) {
         var minutes = Math.floor(millis / 60000);
@@ -80,6 +82,7 @@ export default function Player() {
         fetchSong(token[0].access_token)
             .then(response => {
                 setContent(response.data);
+                setProgress(millisToMinutesAndSeconds(response.data.progress_ms));
             })
     }, [])
 
@@ -88,31 +91,42 @@ export default function Player() {
             fetchSong(token[0].access_token)
                 .then(response => {
                     setContent(response.data);
+                    setProgress(millisToMinutesAndSeconds(response.data.progress_ms));
                 }); 
-        }, 2000)
+        }, 1000)
 
     }, [token, setContent])
 
-    // useEffect(() => {
-    //     if (content) {
-    //         songAnalysis(token[0].access_token, content.item.id)
-    //             .then(response => {
-    //                 console.log(response.data);
-    //                 setTempo(response?.data.track.tempo)
-    //             })
-    //     }
-    // }, [content])
+
+    useEffect(() => {
+        if (content) {
+            songAnalysis(token[0].access_token, content.item.id)
+                .then(response => {
+                    console.log(response.data);
+                    setTempo(response?.data.track.tempo)
+                })
+        }
+    }, [content?.item?.id])
 
     // useEffect(() => {
     //     if (tempo) {
     //         const period = 60 / tempo * 2;
-    //         setInterval(() => {
-    //             changeBrightness(null, 40)
-    //         }, period * 1000);
+    //         // setInterval(() => {
+    //         //     changeBrightness(null, 40)
+    //         // }, period * 1000);
+
+    //         // setInterval(() => {
+    //         //     changeBrightness(null, 60)
+    //         // }, (period * 1000) * 2);
 
     //         setInterval(() => {
-    //             changeBrightness(null, 60)
-    //         }, (period * 1000) * 2);
+    //             // setBg(0.6)
+    //             console.log("Beat");
+    //         }, period * 1000)
+            
+    //         setInterval(() => {
+    //             // setBg(1)
+    //         }, (period * 1000) * 2)
     //     }
     // }, [tempo])
 
@@ -120,7 +134,7 @@ export default function Player() {
 
     return (
         <div className="player" style={{backgroundColor: hexColor, minHeight: "100vh", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center"}}>
-            <ButtonGroup variant="contained" style={{marginTop: "20px"}}>
+            {/* <ButtonGroup variant="contained" style={{marginTop: "20px"}}>
                 <Button onClick={() => {turnLightOnOrOff(false)}}>Turn off</Button>
                 <Button onClick={() => {
                     turnLightOnOrOff(true);
@@ -133,7 +147,7 @@ export default function Player() {
                 onChangeCommitted={changeBrightness}
                 min={1}
                 max={254}
-            />
+            /> */}
 
             {/* <ButtonGroup variant="contained" style={{margin: "10px 0"}}>
                 <Button onClick={() => {turnLightOnOrOff(true, 0, 0)}}>White</Button>
@@ -143,10 +157,12 @@ export default function Player() {
             
             {content ?
                 <> 
-                    <h3 style={{color: "#fff", fontSize: "30px" }}>{content?.item.artists[0].name}</h3>
-                    <h1 style={{color: "#fff", fontSize: "40px", marginBottom: "30px"}}>{content?.item.name}</h1>
+                    <div style={{display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", backgroundColor: "rgba(0, 0, 0, 0.5)", padding: "10px 30px", borderRadius: "20px 20px 0 0"}}>
+                        <h3 style={{color: "#eee", fontSize: "24px", fontWeight: "lighter", fontFamily: "Hino Micho"}}>{content?.item.artists[0].name}</h3>
+                        <h1 style={{color: "#eee", fontSize: "40px", fontWeight: "normal", fontFamily: "Hino Micho"}}>{content?.item.name}</h1>
+                    </div>
                     <img
-                        style={{width: "500px", borderRadius: "50%", border: "4px solid black"}}
+                        style={{width: "500px", border: "4px solid black", opacity: bg}}
                         crossOrigin={"anonymous"}
                         ref={imgRef}
                         src={content?.item.album.images[0].url}
@@ -166,19 +182,25 @@ export default function Player() {
                             changeColor(hueColor[0], hueColor[1]);
                         }}
                     />
-                    <Slider
-                        style={{width: "400px"}}
-                        defaultValue={progress}
-                        min={1}
-                        max={content?.item.duration_ms / 1000}
-                        track
-                    />
-                    <p style={{color: "#fff"}}>{(content?.item.duration_ms / 1000).toFixed(0)}</p>
-                    <p style={{color: "#fff"}}>{length}</p>
-                    <p>{progress}</p>
+                    <div style={{display: "flex", alignItems: "center", marginTop: "10px", backgroundColor: "#000", padding: "10px 17px", borderRadius: "10px"}}>
+                        <p style={{color: "#eee"}}>{progress}</p>
+                        <Slider
+                            key={`slider-${content.progress_ms / 1000}`} /* fixed issue */
+                            style={{width: "400px", margin: "0 25px"}}
+                            defaultValue={content.progress_ms / 1000}
+                            min={1}
+                            max={content?.item.duration_ms / 1000}
+                            track
+                            disabled
+                        />
+                        <p style={{color: "#eee"}}>{length}</p>
+                    </div>
                 </> 
                 :
-                <p style={{color: "#000"}}>No song is currently playing</p>
+                <>
+                    <p style={{color: "#000", fontSize: "24px"}}>No song is currently playing</p>
+                    <img src="./penguin.png" alt="penguin" style={{width: "200px", marginTop: "30px"}} />
+                </>
             }
         </div>
     )
