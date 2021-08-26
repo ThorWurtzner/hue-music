@@ -8,6 +8,7 @@ import { navigate } from "@reach/router";
 import { fetchSong, songAnalysis } from "../../fetches";
 
 import { turnLightOnOrOff, changeBrightness, changeColor } from "../../hueControl";
+import { millisToMinutesAndSeconds, rgbToHex, EnhanceColor, RGBtoXY } from "../../helpers";
 
 import ColorThief from "colorthief";
 import { createRef } from 'react';
@@ -15,123 +16,77 @@ import { createRef } from 'react';
 export default function Player() {
 
     var imgRef = createRef();
-
     var token = useContext(tokenContext);
-    if (token[0]?.access_token === null) {
-        navigate("/");
-    }
-
+    
     var [content, setContent] = useState();
     var [progress, setProgress] = useState();
     var [length, setLength] = useState();
-
     var [hexColor, setHexColor] = useState();
     var [hueColor, setHueColor] = useState();
     var [tempo, setTempo] = useState();
     var [bg, setBg] = useState();
-
-    function millisToMinutesAndSeconds(millis) {
-        var minutes = Math.floor(millis / 60000);
-        var seconds = ((millis % 60000) / 1000).toFixed(0);
-        return minutes + ":" + (seconds < 10 ? '0' : '') + seconds;
-    }
-
-    const rgbToHex = (r, g, b) => '#' + [r, g, b].map(x => {
-        const hex = x.toString(16)
-        return hex.length === 1 ? '0' + hex : hex
-    }).join('')
-
+    
     if (content) {
         length = millisToMinutesAndSeconds(content?.item.duration_ms);
     }
-
-    function EnhanceColor(normalized) {
-        if (normalized > 0.04045) {
-            return Math.pow( (normalized + 0.055) / (1.0 + 0.055), 2.4);
-        }
-        else { return normalized / 12.92; }
-            
-    }
     
-    function RGBtoXY(r, g, b) {
-        let rNorm = r / 255.0;
-        let gNorm = g / 255.0;
-        let bNorm = b / 255.0;
-    
-        let rFinal = EnhanceColor(rNorm);
-        let gFinal = EnhanceColor(gNorm);
-        let bFinal = EnhanceColor(bNorm);
-    
-        let X = rFinal * 0.649926 + gFinal * 0.103455 + bFinal * 0.197109;
-        let Y = rFinal * 0.234327 + gFinal * 0.743075 + bFinal * 0.022598;
-        let Z = rFinal * 0.000000 + gFinal * 0.053077 + bFinal * 1.035763;
-    
-        if ( X + Y + Z === 0) {
-            return [0,0];
-        } else {
-            let xFinal = X / (X + Y + Z);
-            let yFinal = Y / (X + Y + Z);
-        
-            return [xFinal, yFinal];
-        }
-    
-    };
-
+    // Turn on light and get song on load
     useEffect(() => {
         turnLightOnOrOff(true);
-        fetchSong(token[0].access_token)
+        fetchSong(token[0]?.access_token)
+            .then(response => {
+                setContent(response.data);
+                // setProgress(millisToMinutesAndSeconds(response.data.progress_ms));
+            })
+    }, [])
+    
+    // Update Content every second
+    useEffect(function() {
+        setInterval(() => {
+            fetchSong(token[0]?.access_token)
             .then(response => {
                 setContent(response.data);
                 setProgress(millisToMinutesAndSeconds(response.data.progress_ms));
-            })
-    }, [])
-
-    useEffect(function() {
-        setInterval(() => {
-            fetchSong(token[0].access_token)
-                .then(response => {
-                    setContent(response.data);
-                    setProgress(millisToMinutesAndSeconds(response.data.progress_ms));
-                }); 
+                console.log(content);
+            }); 
         }, 1000)
-
-    }, [token, setContent])
-
-
+    }, [token])
+    
+    // Get Track Analysis
     useEffect(() => {
         if (content) {
-            songAnalysis(token[0].access_token, content.item.id)
-                .then(response => {
-                    console.log(response.data);
-                    setTempo(response?.data.track.tempo)
-                })
+            songAnalysis(token[0]?.access_token, content.item.id)
+            .then(response => {
+                setTempo(response?.data.track.tempo)
+            })
         }
     }, [content?.item?.id])
 
+    
     // useEffect(() => {
     //     if (tempo) {
     //         const period = 60 / tempo * 2;
     //         // setInterval(() => {
     //         //     changeBrightness(null, 40)
     //         // }, period * 1000);
-
+    
     //         // setInterval(() => {
     //         //     changeBrightness(null, 60)
     //         // }, (period * 1000) * 2);
-
+    
     //         setInterval(() => {
     //             // setBg(0.6)
     //             console.log("Beat");
     //         }, period * 1000)
-            
+    
     //         setInterval(() => {
     //             // setBg(1)
     //         }, (period * 1000) * 2)
     //     }
     // }, [tempo])
-
+    
     // console.log(tempo);
-
+                                
     return (
         <div className="player" style={{backgroundColor: hexColor, minHeight: "100vh", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center"}}>
             {/* <ButtonGroup variant="contained" style={{marginTop: "20px"}}>
@@ -140,9 +95,9 @@ export default function Player() {
                     turnLightOnOrOff(true);
                     changeColor(hueColor[0], hueColor[1]);
                 }}>Turn on</Button>
-            </ButtonGroup>
-
-            <Slider
+                </ButtonGroup>
+                
+                <Slider
                 style={{width: "200px"}}
                 onChangeCommitted={changeBrightness}
                 min={1}
