@@ -25,10 +25,14 @@ export default function Player() {
     var [hueColor, setHueColor] = useState();
     var [tempo, setTempo] = useState();
     var [bg, setBg] = useState();
+
+    var [beat1, setBeat1] = useState();
+    var [beat2, setBeat2] = useState();
     
     if (content) {
         length = millisToMinutesAndSeconds(content?.item.duration_ms);
     }
+
     
     // Turn on light and get song on load
     useEffect(() => {
@@ -47,10 +51,9 @@ export default function Player() {
             .then(response => {
                 setContent(response.data);
                 setProgress(millisToMinutesAndSeconds(response.data.progress_ms));
-                console.log(content);
             }); 
         }, 1000)
-    }, [token])
+    }, [])
     
     // Get Track Analysis
     useEffect(() => {
@@ -63,27 +66,38 @@ export default function Player() {
     }, [content?.item?.id])
 
     
-    // useEffect(() => {
-    //     if (tempo) {
-    //         const period = 60 / tempo * 2;
-    //         // setInterval(() => {
-    //         //     changeBrightness(null, 40)
-    //         // }, period * 1000);
+    useEffect(() => {
+        if (tempo) {
+            const period = 60 / tempo * 2;
+            // setInterval(() => {
+            //     changeBrightness(null, 40)
+            // }, period * 1000);
     
-    //         // setInterval(() => {
-    //         //     changeBrightness(null, 60)
-    //         // }, (period * 1000) * 2);
+            // setInterval(() => {
+            //     changeBrightness(null, 60)
+            // }, (period * 1000) * 2);
+            console.log("effect");
+            
+
+            // EVERY TIME COMPONENT RERENDERS ANOTHER INSTANCE IS CREATED, FIX IT
+            // REMOVE INTERVALS BEFORE SETTING NEW
+            // clearInterval(beat1);
+            // clearInterval(beat2);
+
+            clearInterval(beat1)
+            clearInterval(beat2)
     
-    //         setInterval(() => {
-    //             // setBg(0.6)
-    //             console.log("Beat");
-    //         }, period * 1000)
+            setBeat1(setInterval(() => {
+                setBg(0.6)
+                // console.log("Beat1");
+            }, period * 1000))
     
-    //         setInterval(() => {
-    //             // setBg(1)
-    //         }, (period * 1000) * 2)
-    //     }
-    // }, [tempo])
+            setBeat2(setInterval(() => {
+                setBg(1)
+                // console.log("Beat2");
+            }, (period * 1000) * 2))
+        }
+    }, [tempo])
     
     // console.log(tempo);
                                 
@@ -137,7 +151,7 @@ export default function Player() {
                             changeColor(hueColor[0], hueColor[1]);
                         }}
                     />
-                    <div style={{display: "flex", alignItems: "center", marginTop: "10px", backgroundColor: "#000", padding: "10px 17px", borderRadius: "10px"}}>
+                    <div style={{display: "flex", alignItems: "center", marginTop: "10px", backgroundColor: "#000", padding: "10px 17px", borderRadius: "10px", width: "500px"}}>
                         <p style={{color: "#eee"}}>{progress}</p>
                         <Slider
                             key={`slider-${content.progress_ms / 1000}`} /* fixed issue */
