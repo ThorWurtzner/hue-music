@@ -88,12 +88,14 @@ export default function Player() {
             clearInterval(beat2)
     
             setBeat1(setInterval(() => {
-                setBg(0.6)
+                setBg(0.6);
+                changeBrightness(null, 40);
                 // console.log("Beat1");
             }, period * 1000))
     
             setBeat2(setInterval(() => {
                 setBg(1)
+                changeBrightness(null, 80);
                 // console.log("Beat2");
             }, (period * 1000) * 2))
         }
@@ -103,7 +105,7 @@ export default function Player() {
                                 
     return (
         <div className="player" style={{backgroundColor: hexColor, minHeight: "100vh", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center"}}>
-            {/* <ButtonGroup variant="contained" style={{marginTop: "20px"}}>
+            <ButtonGroup variant="contained" style={{marginTop: "20px"}}>
                 <Button onClick={() => {turnLightOnOrOff(false)}}>Turn off</Button>
                 <Button onClick={() => {
                     turnLightOnOrOff(true);
@@ -116,7 +118,7 @@ export default function Player() {
                 onChangeCommitted={changeBrightness}
                 min={1}
                 max={254}
-            /> */}
+            />
 
             {/* <ButtonGroup variant="contained" style={{margin: "10px 0"}}>
                 <Button onClick={() => {turnLightOnOrOff(true, 0, 0)}}>White</Button>

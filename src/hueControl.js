@@ -3,6 +3,7 @@ import axios from "axios";
 var IP_ADDRESS = "192.168.8.100";
 var HUE_ID = 8;
 var USERNAME = "0TM4TMVWbNkdKeZncMxBP3k-o2U3IgbFiPPuKoSn";
+// CREATE LOCALSTORAGE FROM THESE!!!
 
 const turnLightOnOrOff = async (on, sat, hue) => {
     try {
