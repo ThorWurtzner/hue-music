@@ -28,8 +28,13 @@ export default function Login(props) {
 
     return (
         <div className="login">
-            {ls === true ? 
+            {
+            ls === true 
+            ? 
+            <>
+            <p>Lamp is registered</p>
             <a href={`https://accounts.spotify.com/authorize?${queryParameters}`}>Login to Spotify</a>
+            </>
             :
             <form className="login__form" onSubmit={event => handleSubmit(event)}>
                 <div>
@@ -51,7 +56,8 @@ export default function Login(props) {
                     />
                 </div>
                 <Button variant="contained" color="primary" type="submit">Register</Button>
-            </form>}
+            </form>
+            }
         </div>
     )
 }

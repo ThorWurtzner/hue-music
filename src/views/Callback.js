@@ -16,7 +16,10 @@ export default function Callback(props) {
         .then(response => {
             setToken(response.data);
             navigate("/player");
-        });
+        })
+        // .error(error => {
+        //     navigate("/");
+        // })
     }, [token, setToken, code]);
     
     return null;

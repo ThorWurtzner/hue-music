@@ -41,7 +41,7 @@ export default function Player() {
             .then(response => {
                 setContent(response.data);
                 // setProgress(millisToMinutesAndSeconds(response.data.progress_ms));
-            })
+            });
     }, [])
     
     // Update Content every second
@@ -51,7 +51,12 @@ export default function Player() {
             .then(response => {
                 setContent(response.data);
                 setProgress(millisToMinutesAndSeconds(response.data.progress_ms));
-            }); 
+                // if (response.data.is_playing === false) {
+                //     turnLightOnOrOff(false);
+                //     clearInterval(beat1);
+                //     clearInterval(beat2);
+                // }
+            })
         }, 1000)
     }, [])
     
@@ -76,7 +81,6 @@ export default function Player() {
             // setInterval(() => {
             //     changeBrightness(null, 60)
             // }, (period * 1000) * 2);
-            console.log("effect");
             
 
             // EVERY TIME COMPONENT RERENDERS ANOTHER INSTANCE IS CREATED, FIX IT
@@ -89,13 +93,13 @@ export default function Player() {
     
             setBeat1(setInterval(() => {
                 setBg(0.6);
-                changeBrightness(null, 40);
+                changeBrightness(null, 70);
                 // console.log("Beat1");
             }, period * 1000))
     
             setBeat2(setInterval(() => {
                 setBg(1)
-                changeBrightness(null, 80);
+                changeBrightness(null, 100);
                 // console.log("Beat2");
             }, (period * 1000) * 2))
         }
@@ -128,9 +132,9 @@ export default function Player() {
             
             {content ?
                 <> 
-                    <div style={{display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", backgroundColor: "rgba(0, 0, 0, 0.5)", padding: "10px 30px", borderRadius: "20px 20px 0 0"}}>
-                        <h3 style={{color: "#eee", fontSize: "24px", fontWeight: "lighter", fontFamily: "Hino Micho"}}>{content?.item.artists[0].name}</h3>
-                        <h1 style={{color: "#eee", fontSize: "40px", fontWeight: "normal", fontFamily: "Hino Micho"}}>{content?.item.name}</h1>
+                    <div style={{display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", backgroundColor: "rgba(0, 0, 0, 0.5)", padding: "20px 30px", borderRadius: "20px", marginBottom: "10px"}}>
+                        <h3 style={{color: "#eee", fontSize: "20px", fontWeight: "lighter", fontFamily: "Hino Micho", marginBottom: "10px"}}>{content?.item.artists[0].name}</h3>
+                        <h1 style={{color: "#eee", fontSize: "30px", fontWeight: "normal", fontFamily: "Hino Micho"}}>{content?.item.name}</h1>
                     </div>
                     <img
                         style={{width: "500px", border: "4px solid black", opacity: bg}}
