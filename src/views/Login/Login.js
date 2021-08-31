@@ -4,10 +4,9 @@ import { navigate } from "@reach/router";
 import "./Login.css";
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
+import { changeBrightness } from "../../hueControl";
 
 export default function Login(props) {
-
-    var [ls, setLs] = useState(false);
     
     var queryParameters = querystring.stringify({
         response_type: "code",
@@ -16,43 +15,52 @@ export default function Login(props) {
         redirect_uri: "http://localhost:8888/callback",
         state: "kasdalskdjalksjdalksd"
     });
-    
+
+    changeBrightness(null, 0);
 
     function handleSubmit(event) {
         event.preventDefault();
-        alert("Registered");
-        setLs(true);
+        window.localStorage.setItem("id", event.target.id.value)
+        window.localStorage.setItem("ip", event.target.ip.value)
+        window.localStorage.setItem("username", event.target.username.value)
+        navigate(`https://accounts.spotify.com/authorize?${queryParameters}`);
     }
 
-    // navigate(`https://accounts.spotify.com/authorize?${queryParameters}`);
 
     return (
         <div className="login">
             {
-            ls === true 
+            window.localStorage.getItem("id") && window.localStorage.getItem("ip") && window.localStorage.getItem("username")
             ? 
-            <>
-            <p>Lamp is registered</p>
-            <a href={`https://accounts.spotify.com/authorize?${queryParameters}`}>Login to Spotify</a>
-            </>
+            <div className="login__ready">
+                {/* <p>Lamp is registered</p> */}
+                <img src="/penguin.png" alt="penguin" />
+                <a href={`https://accounts.spotify.com/authorize?${queryParameters}`}>Login to Spotify</a>
+            </div>
             :
             <form className="login__form" onSubmit={event => handleSubmit(event)}>
                 <div>
-                    <TextField 
+                    <TextField
+                        name="id"
                         id="standard-basic" 
-                        label="Hue ID" 
+                        label="Hue ID"
+                        required
                     />
                 </div>
                 <div>
                     <TextField 
+                        name="ip"
                         id="standard-basic" 
                         label="IP Address" 
+                        required
                     />
                 </div>
                 <div>
                     <TextField 
+                        name="username"
                         id="standard-basic"
                         label="Username" 
+                        required
                     />
                 </div>
                 <Button variant="contained" color="primary" type="submit">Register</Button>

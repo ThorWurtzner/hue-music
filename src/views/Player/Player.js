@@ -25,6 +25,7 @@ export default function Player() {
     var [hueColor, setHueColor] = useState();
     var [tempo, setTempo] = useState();
     var [bg, setBg] = useState();
+    var [start, setStart] = useState(false);
 
     var [beat1, setBeat1] = useState();
     var [beat2, setBeat2] = useState();
@@ -32,33 +33,56 @@ export default function Player() {
     if (content) {
         length = millisToMinutesAndSeconds(content?.item.duration_ms);
     }
-
     
     // Turn on light and get song on load
     useEffect(() => {
+        if (!token[0]?.access_token) {
+            changeBrightness(null, 0);
+            console.log("No token present");
+            navigate("/")
+        }
         turnLightOnOrOff(true);
         fetchSong(token[0]?.access_token)
             .then(response => {
                 setContent(response.data);
+                console.log(content);
+                if (response?.data?.is_playing === false || !content) {
+                    clearInterval(beat1);
+                    clearInterval(beat2);
+                }
                 // setProgress(millisToMinutesAndSeconds(response.data.progress_ms));
             });
     }, [])
     
     // Update Content every second
     useEffect(function() {
-        setInterval(() => {
-            fetchSong(token[0]?.access_token)
-            .then(response => {
-                setContent(response.data);
-                setProgress(millisToMinutesAndSeconds(response.data.progress_ms));
-                // if (response.data.is_playing === false) {
-                //     turnLightOnOrOff(false);
-                //     clearInterval(beat1);
-                //     clearInterval(beat2);
-                // }
-            })
-        }, 1000)
+        console.log(content?.is_playing);
+        if (token[0]?.access_token) {
+            setInterval(() => {
+                fetchSong(token[0]?.access_token)
+                .then(response => {
+                    setContent(response.data);
+                    setProgress(millisToMinutesAndSeconds(response.data.progress_ms));
+                    // if (response.data.is_playing === false) {
+                    //     turnLightOnOrOff(false);
+                    //     clearInterval(beat1);
+                    //     clearInterval(beat2);
+                    // }
+                })
+            }, 1000)
+        }
     }, [])
+
+    useEffect(() => {
+        if (content?.is_playing === false || !content) {
+            clearInterval(beat1);
+            clearInterval(beat2);
+            setStart(false);
+        }
+        if (content?.is_playing === true) {
+            setStart(true);
+        }
+    }, [content])
     
     // Get Track Analysis
     useEffect(() => {
@@ -66,6 +90,7 @@ export default function Player() {
             songAnalysis(token[0]?.access_token, content.item.id)
             .then(response => {
                 setTempo(response?.data.track.tempo)
+                console.log(response?.data);
             })
         }
     }, [content?.item?.id])
@@ -90,26 +115,29 @@ export default function Player() {
 
             clearInterval(beat1)
             clearInterval(beat2)
+
+            if (token[0]?.access_token) {
+                setBeat1(setInterval(() => {
+                    setBg(0.6);
+                    changeBrightness(null, 40);
+                    // console.log("Beat1");
+                }, period * 1000))
+        
+                setBeat2(setInterval(() => {
+                    setBg(1)
+                    changeBrightness(null, 70);
+                    // console.log("Beat2");
+                }, (period * 1000) * 2))
+            }
     
-            setBeat1(setInterval(() => {
-                setBg(0.6);
-                changeBrightness(null, 70);
-                // console.log("Beat1");
-            }, period * 1000))
-    
-            setBeat2(setInterval(() => {
-                setBg(1)
-                changeBrightness(null, 100);
-                // console.log("Beat2");
-            }, (period * 1000) * 2))
         }
-    }, [tempo])
+    }, [tempo, content?.is_playing])
     
     // console.log(tempo);
                                 
     return (
         <div className="player" style={{backgroundColor: hexColor, minHeight: "100vh", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center"}}>
-            <ButtonGroup variant="contained" style={{marginTop: "20px"}}>
+            {/* <ButtonGroup variant="contained" style={{marginTop: "20px"}}>
                 <Button onClick={() => {turnLightOnOrOff(false)}}>Turn off</Button>
                 <Button onClick={() => {
                     turnLightOnOrOff(true);
@@ -122,7 +150,7 @@ export default function Player() {
                 onChangeCommitted={changeBrightness}
                 min={1}
                 max={254}
-            />
+            /> */}
 
             {/* <ButtonGroup variant="contained" style={{margin: "10px 0"}}>
                 <Button onClick={() => {turnLightOnOrOff(true, 0, 0)}}>White</Button>
@@ -132,9 +160,9 @@ export default function Player() {
             
             {content ?
                 <> 
-                    <div style={{display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", backgroundColor: "rgba(0, 0, 0, 0.5)", padding: "20px 30px", borderRadius: "20px", marginBottom: "10px"}}>
-                        <h3 style={{color: "#eee", fontSize: "20px", fontWeight: "lighter", fontFamily: "Hino Micho", marginBottom: "10px"}}>{content?.item.artists[0].name}</h3>
-                        <h1 style={{color: "#eee", fontSize: "30px", fontWeight: "normal", fontFamily: "Hino Micho"}}>{content?.item.name}</h1>
+                    <div style={{display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "20px 30px", borderRadius: "20px", marginBottom: "10px"}}>
+                        <h3 style={{color: "#eee", fontSize: "20px", fontWeight: "lighter", fontFamily: "Hino Micho", marginBottom: "10px", textShadow: "1px 1px 4px #000"}}>{content?.item.artists[0].name}</h3>
+                        <h1 style={{color: "#eee", fontSize: "30px", fontWeight: "normal", fontFamily: "Hino Micho", textShadow: "1px 1px 4px #000"}}>{content?.item.name}</h1>
                     </div>
                     <img
                         style={{width: "500px", border: "4px solid black", opacity: bg}}

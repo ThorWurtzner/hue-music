@@ -35,3 +35,41 @@
     border-radius: 10px 10px 0 0;
 }
 
+.login__ready {
+    width: 200px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.login__ready img {
+    width: 150px;
+    margin-bottom: 20px;
+}
+
+.login__ready p {
+    margin-bottom: 20px;
+    font-size: 20px;
+}
+
+.login__ready a {
+    display: block;
+    text-decoration: none;
+    height: 40px;
+    width: 100%;
+    background-color: blue;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 100px;
+    font-size: 16px;
+    color: #fff;
+    font-weight: bolder;
+    transition: background-color 0.1s;
+}
+
+.login__ready a:hover {
+    background-color: rgb(0, 0, 240);
+}
+
