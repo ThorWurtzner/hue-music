@@ -31,7 +31,7 @@ export default function Player() {
     var [beat2, setBeat2] = useState();
     
     if (content) {
-        length = millisToMinutesAndSeconds(content?.item.duration_ms);
+        length = millisToMinutesAndSeconds(content?.item?.duration_ms);
     }
     
     // Turn on light and get song on load
@@ -69,7 +69,7 @@ export default function Player() {
                     //     clearInterval(beat2);
                     // }
                 })
-            }, 1000)
+            }, 500)
         }
     }, [])
 
@@ -121,13 +121,13 @@ export default function Player() {
                     setBg(0.6);
                     changeBrightness(null, 40);
                     // console.log("Beat1");
-                }, period * 1000))
+                }, period * 500))
         
                 setBeat2(setInterval(() => {
                     setBg(1)
                     changeBrightness(null, 70);
                     // console.log("Beat2");
-                }, (period * 1000) * 2))
+                }, (period * 1000)))
             }
     
         }
