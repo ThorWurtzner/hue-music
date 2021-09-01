@@ -87,7 +87,7 @@ export default function Player() {
     // Get Track Analysis
     useEffect(() => {
         if (content) {
-            songAnalysis(token[0]?.access_token, content.item.id)
+            songAnalysis(token[0]?.access_token, content.item?.id)
             .then(response => {
                 setTempo(response?.data.track.tempo)
                 console.log(response?.data);
@@ -161,14 +161,14 @@ export default function Player() {
             {content ?
                 <> 
                     <div style={{display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "20px 30px", borderRadius: "20px", marginBottom: "10px"}}>
-                        <h3 style={{color: "#eee", fontSize: "20px", fontWeight: "lighter", fontFamily: "Hino Micho", marginBottom: "10px", textShadow: "1px 1px 4px #000"}}>{content?.item.artists[0].name}</h3>
-                        <h1 style={{color: "#eee", fontSize: "30px", fontWeight: "normal", fontFamily: "Hino Micho", textShadow: "1px 1px 4px #000"}}>{content?.item.name}</h1>
+                        <h3 style={{color: "#eee", fontSize: "20px", fontWeight: "lighter", fontFamily: "Hino Micho", marginBottom: "10px", textShadow: "1px 1px 4px #000"}}>{content?.item?.artists[0].name}</h3>
+                        <h1 style={{color: "#eee", fontSize: "30px", fontWeight: "normal", fontFamily: "Hino Micho", textShadow: "1px 1px 4px #000"}}>{content?.item?.name}</h1>
                     </div>
                     <img
                         style={{width: "500px", border: "4px solid black", opacity: bg}}
                         crossOrigin={"anonymous"}
                         ref={imgRef}
-                        src={content?.item.album.images[0].url}
+                        src={content?.item?.album?.images[0].url}
                         alt={"example"}
                         className={"example__img"}
                         onLoad={() => {
@@ -192,7 +192,7 @@ export default function Player() {
                             style={{width: "400px", margin: "0 25px"}}
                             defaultValue={content.progress_ms / 1000}
                             min={1}
-                            max={content?.item.duration_ms / 1000}
+                            max={content?.item?.duration_ms / 1000}
                             track
                             disabled
                         />
