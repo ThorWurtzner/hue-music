@@ -6,7 +6,7 @@ var USERNAME = window.localStorage.getItem("username"); // 0TM4TMVWbNkdKeZncMxBP
 
 const turnLightOnOrOff = async (on, sat, hue) => {
     try {
-        return await axios.put(`http://${IP_ADDRESS}/api/${USERNAME}/lights/${HUE_ID}/state`, {
+        return await axios.put(`//${IP_ADDRESS}/api/${USERNAME}/lights/${HUE_ID}/state`, {
             on: on,
             sat: sat ? sat : 0,
             hue: hue ? hue : 0,
@@ -18,7 +18,7 @@ const turnLightOnOrOff = async (on, sat, hue) => {
 
 async function changeBrightness (event, newValue) {
     try {
-        return await axios.put(`http://${IP_ADDRESS}/api/${USERNAME}/lights/${HUE_ID}/state`, {
+        return await axios.put(`//${IP_ADDRESS}/api/${USERNAME}/lights/${HUE_ID}/state`, {
             bri: newValue,
             transitiontime: 0,
         });
@@ -29,7 +29,7 @@ async function changeBrightness (event, newValue) {
 
 async function changeColor (x, y) {
     try {
-        return await axios.put(`http://${IP_ADDRESS}/api/${USERNAME}/lights/${HUE_ID}/state`, {
+        return await axios.put(`//${IP_ADDRESS}/api/${USERNAME}/lights/${HUE_ID}/state`, {
             xy: [
                 x,
                 y
