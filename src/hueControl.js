@@ -20,7 +20,7 @@ async function changeBrightness (event, newValue) {
     try {
         return await axios.put(`http://${IP_ADDRESS}/api/${USERNAME}/lights/${HUE_ID}/state`, {
             bri: newValue,
-            transitiontime: 1,
+            transitiontime: 0,
         });
     } catch (err) {
         console.error(err);

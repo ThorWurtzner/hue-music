@@ -119,13 +119,13 @@ export default function Player() {
             if (token[0]?.access_token) {
                 setBeat1(setInterval(() => {
                     setBg(0.6);
-                    changeBrightness(null, 40);
+                    changeBrightness(null, 120);
                     // console.log("Beat1");
                 }, period * 500))
         
                 setBeat2(setInterval(() => {
                     setBg(1)
-                    changeBrightness(null, 70);
+                    changeBrightness(null, 150);
                     // console.log("Beat2");
                 }, (period * 1000)))
             }
